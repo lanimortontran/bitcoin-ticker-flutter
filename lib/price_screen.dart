@@ -10,7 +10,15 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
+  CoinData coinData = CoinData();
   String selectedCurrency = 'USD';
+  String exchangeRate = '';
+
+  @override
+  void initState() {
+    super.initState();
+    getExchangeRate();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +41,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = ? USD',
+                  '1 BTC = $exchangeRate $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
@@ -70,6 +78,7 @@ class _PriceScreenState extends State<PriceScreen> {
       onChanged: (value) {
         setState(() {
           selectedCurrency = value;
+          getExchangeRate();
         });
       },
     );
@@ -83,11 +92,20 @@ class _PriceScreenState extends State<PriceScreen> {
 
     return CupertinoPicker(
       onSelectedItemChanged: (int selectedIndex) {
-        print(selectedIndex);
+        selectedCurrency = currenciesList[selectedIndex];
+        getExchangeRate();
       },
       itemExtent: 32.0,
       children: currencyItems,
       backgroundColor: Colors.lightBlue,
     );
+  }
+
+  Future<void> getExchangeRate() async {
+    Map<String, dynamic> data = await coinData.getCoinData(selectedCurrency);
+    setState(() {
+      double rawRate = data['rate'];
+      exchangeRate = rawRate.toStringAsFixed(2);
+    });
   }
 }
