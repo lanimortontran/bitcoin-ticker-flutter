@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:bitcoin_ticker/coin_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -42,50 +44,50 @@ class _PriceScreenState extends State<PriceScreen> {
             ),
           ),
           Container(
-              height: 150.0,
-              alignment: Alignment.center,
-              padding: EdgeInsets.only(bottom: 30.0),
-              color: Colors.lightBlue,
-              // child: DropdownButton<String>(
-              //   value: selectedCurrency,
-              //   items: getCurrencyDropDownMenuItems(),
-              //   onChanged: (value) {
-              //     setState(() {
-              //       selectedCurrency = value;
-              //     });
-              //   },
-              // ),
-              child: CupertinoPicker(
-                onSelectedItemChanged: (int selectedIndex) {
-                  print(selectedIndex);
-                },
-                itemExtent: 32.0,
-                children: getCupertinoPickerItems(),
-                backgroundColor: Colors.lightBlue,
-              )),
+            height: 150.0,
+            alignment: Alignment.center,
+            padding: EdgeInsets.only(bottom: 30.0),
+            color: Colors.lightBlue,
+            child: Platform.isIOS ? iOSPicker() : androidDropdown(),
+          ),
         ],
       ),
     );
   }
-}
 
-List<DropdownMenuItem<String>> getCurrencyDropDownMenuItems() {
-  List<DropdownMenuItem<String>> currencyItems = [];
-  currenciesList.forEach((currency) {
-    currencyItems.add(DropdownMenuItem(
-      child: Text(currency),
-      value: currency,
-    ));
-  });
+  DropdownButton<String> androidDropdown() {
+    List<DropdownMenuItem<String>> currencyItems = [];
+    currenciesList.forEach((currency) {
+      currencyItems.add(DropdownMenuItem(
+        child: Text(currency),
+        value: currency,
+      ));
+    });
 
-  return currencyItems;
-}
+    return DropdownButton<String>(
+      value: selectedCurrency,
+      items: currencyItems,
+      onChanged: (value) {
+        setState(() {
+          selectedCurrency = value;
+        });
+      },
+    );
+  }
 
-List<Text> getCupertinoPickerItems() {
-  List<Text> currencyItems = [];
-  currenciesList.forEach((currency) {
-    currencyItems.add(Text(currency));
-  });
+  CupertinoPicker iOSPicker() {
+    List<Text> currencyItems = [];
+    currenciesList.forEach((currency) {
+      currencyItems.add(Text(currency));
+    });
 
-  return currencyItems;
+    return CupertinoPicker(
+      onSelectedItemChanged: (int selectedIndex) {
+        print(selectedIndex);
+      },
+      itemExtent: 32.0,
+      children: currencyItems,
+      backgroundColor: Colors.lightBlue,
+    );
+  }
 }
